@@ -81,21 +81,20 @@ jobs:
   deploy:
     needs: [build-eleventy, build-quartz]
     # Run as long as Eleventy succeeded, regardless of Quartz
-    if: always()
+    if: always() && needs.build-eleventy.result == 'success'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Download Eleventy output
-      continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           name: eleventy-output
           path: _site
 
       - name: Download Quartz output
-        continue-on-error: true
+        if: needs.build-quartz.result == 'success'
         uses: actions/download-artifact@v4
         with:
           name: quartz-output
