@@ -22,6 +22,8 @@
     <meta name="twitter:description" content="{{ site.description }}">
     <meta name="twitter:image" content="https://resume.willkelly.dev/assets/hyperbola-on-white.png">
 
+    {% block head %}{% endblock %}
+
     {% if css %}
     <link rel="stylesheet" href="/css/{{ css }}">
     {% endif %}

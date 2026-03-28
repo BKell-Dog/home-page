@@ -1,5 +1,5 @@
 body {
-    font-family: "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+    font-family: "Syncopate", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
     margin: 0;
     overflow-x: hidden;
     height: 100vh;
@@ -35,7 +35,8 @@ body {
     margin: 0;
    
     text-transform:uppercase;
-    font-size:26px; 
+    font-size:26px;
+    font-weight: normal;
     letter-spacing:1px;
     
     display: grid;
@@ -122,6 +123,7 @@ body {
 /* Typewriter Effect */
 .typewrite {
     color: white;
+    text-transform: uppercase;
 }
 
 /* Media Queries for Responsive Design */

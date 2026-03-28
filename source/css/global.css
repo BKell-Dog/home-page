@@ -7,6 +7,12 @@ html {
 	background-color: var(--off-white);
 }
 
+body {
+	background-color: var(--off-white);
+	color: var(--off-black);
+	font-family: "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+}
+
 article {
 	margin: 5vh auto;
 	max-width: 60vw;
