@@ -58,7 +58,7 @@ jobs:
           cp quartz-config/quartz.layout.ts _quartz/quartz.layout.ts
 
       - name: Copy custom components
-        run: cp quartz-config/components/. _quartz/quartz/components/
+        run: cp -r quartz-config/components/. _quartz/quartz/components/
 
       - name: Copy favicon
         run: cp source/assets/favicon.png _quartz/quartz/static/icon.png
@@ -81,24 +81,32 @@ jobs:
   deploy:
     needs: [build-eleventy, build-quartz]
     # Run as long as Eleventy succeeded, regardless of Quartz
-    if: always() && needs.build-eleventy.result == 'success'
+    if: always()
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Download Eleventy output
+      continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           name: eleventy-output
           path: _site
 
       - name: Download Quartz output
-        if: needs.build-quartz.result == 'success'
+        continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           name: quartz-output
           path: _site/knowledge
+
+      - name: Check at least one artifact exists
+        run: |
+          if [ -z "$(ls -A _site 2>/dev/null)" ]; then
+            echo "No artifacts available, nothing to deploy"
+            exit 1
+          fi
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
