@@ -101,13 +101,6 @@ jobs:
           name: quartz-output
           path: _site/knowledge
 
-      - name: Check at least one artifact exists
-        run: |
-          if [ -z "$(ls -A _site 2>/dev/null)" ]; then
-            echo "No artifacts available, nothing to deploy"
-            exit 1
-          fi
-
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
