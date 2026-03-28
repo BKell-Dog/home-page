@@ -4,6 +4,8 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy({ "source/scripts": "scripts" });
   eleventyConfig.addPassthroughCopy({ "source/data": "data"});
 
+  eleventyConfig.ignores.add("source/knowledge/**");
+
   eleventyConfig.addPairedShortcode("accordion", function(content, header) {
     return `<div class="accordion role-description">
         <button class="accordion-header" aria-expanded="false">
