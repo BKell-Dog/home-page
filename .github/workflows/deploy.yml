@@ -52,8 +52,13 @@ jobs:
         run: npm ci
         working-directory: _quartz
 
-      - name: Copy Quartz config
-        run: cp quartz.config.ts _quartz/quartz.config.ts
+      - name: Copy Quartz config and layout
+        run: |
+          cp quartz-config/quartz.config.ts _quartz/quartz.config.ts
+          cp quartz-config/quartz.layout.ts _quartz/quartz.layout.ts
+
+      - name: Copy custom components
+        run: cp quartz-config/components/. _quartz/quartz/components/
 
       - name: Copy favicon
         run: cp source/assets/favicon.png _quartz/quartz/static/icon.png
