@@ -1,3 +1,13 @@
+const footnote = require("markdown-it-footnote");
+const markdownIt = require("markdown-it");
+const md = markdownIt({
+  html: true,
+  linkify: true,
+  typographer: true,
+  breaks: true
+});
+const hljs = require("highlight.js"); // For code block highlighting.
+
 module.exports = function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy({ "source/assets": "assets" });
   eleventyConfig.addPassthroughCopy({ "source/css": "css" });
@@ -5,6 +15,62 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy({ "source/data": "data"});
 
   eleventyConfig.ignores.add("source/knowledge/**");
+
+  eleventyConfig.addCollection("lettres", function(collectionApi) {
+    return collectionApi.getFilteredByGlob("source/lettres/*.md");
+  });
+
+  eleventyConfig.amendLibrary("md", mdLib => {
+    mdLib.use(footnote);
+
+    // In-text footnote shows as superscript number without brackets
+    mdLib.renderer.rules.footnote_ref = (tokens, idx, options, env, slf) => {
+      const id = tokens[idx].meta.id + 1;
+      return `<sup class="footnote-ref" id="fnref${id}"><a href="#fn${id}" rel="footnote">${id}</a></sup>`;
+    };
+
+    // Ensure bottom footnote block shows as numbered list
+    mdLib.renderer.rules.footnote_block = (tokens, idx, options, env, slf) => {
+      let html = '<hr class="footnotes-sep">\n<section class="footnotes">\n<ol class="footnotes-list">\n';
+      for (let i = 0; i < tokens[idx].children.length; i++) {
+        const token = tokens[idx].children[i];
+        if (token.type === "footnote_open") {
+          const id = token.meta.id + 1;
+          html += `<li id="fn:${id}" class="footnote-item">`;
+        } else if (token.type === "footnote_close") {
+          html += "</li>\n";
+        } else if (token.type === "inline") {
+          html += slf.renderInline(token.children, options, env);
+        }
+      }
+      html += "</ol>\n</section>";
+      return html;
+    };
+
+    // Custom code block renderer using highlight.js
+    mdLib.renderer.rules.fence = (tokens, idx) => {
+      const token = tokens[idx];
+      const lang  = (token.info || "").trim().toLowerCase();
+      const source = token.content;
+
+      let highlighted;
+      if (lang && hljs.getLanguage(lang)) {
+        highlighted = hljs.highlight(source, { language: lang }).value;
+      } else {
+        // Unknown or unspecified language — escape and render as plain text
+        highlighted = hljs.highlightAuto(source).value;
+      }
+
+      const displayLang = lang || "text";
+
+      return `<div class="highlight">` +
+        `<div class="code-title">${displayLang}<button class="copy-button">Copy</button></div>` +
+        `<pre class="hljs language-${displayLang}" data-language="${displayLang}" tabindex="0">` +
+          `<code>${highlighted}</code>` +
+        `</pre>` +
+      `</div>\n`;
+    };
+  });
 
   eleventyConfig.addPairedShortcode("accordion", function(content, header) {
     return `<div class="accordion role-description">
